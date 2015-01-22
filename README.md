@@ -1,6 +1,6 @@
 <br/>
 <br/>
-<h2  >
+<h2 id = "Inheritance" >
 jFlow Framework
 </h2>
 
@@ -23,17 +23,13 @@ For Browser, download here
 
 Usage
 -----
-<br />
 
 For node.js
 
     require("jflow-framework");
-    
-<br />
 
 For any browser, in the html header or body footer:
 
 	<script src="..pathto/jflow-framework.js"></script>	
-<br />
 
 	
