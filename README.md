@@ -97,7 +97,7 @@ Flow-enabled function
 			iCanPause();
 		},
 		
-		//  the third function-segment
+		//  second function-segment
 		//  this function will not execute until iCanPause() is complete
 		function( flow ) {
 			 
@@ -111,4 +111,117 @@ For a complete explanination and to explore the full potential of the pause() ev
 Components
 -----
 
+<h4 >
+Adding a component
+</h4>
+
+	//  define a component
+	var Foo = function(jflow) {
+	    //  component definition
+	    return {
+			//  component intialization
+			init: function( st_name ){
+	        	 //  do some initialization tasks
+	        	 this.st_name = st_name;
+	        	 console.log("i am initalized! My name is "+st_name);
+	        },
+	        //  component method
+	        do : function() {
+	            console.log( this.st_name+" does this");
+	        }
+	    };
+	};
+
+
+	//  add the component
+	jflow.addComponent("Foo", Foo);
+	
+	
+<h4 >
+Instance of the component
+</h4>	
+	
+	////		writes "i am initalized! My name is bob" from the above example
+	var foo = jflow.Foo( "bob" );
+	
+<h4 >
+Accessing instance properties:
+</h4>
+	
+	////		writes "bob does this" from the above example
+	foo.do();
+<h4 >
+Static properties
+</h4>
+	
+	var Foo = function(jflow) {
+	    
+	    return {
+			init: function( st_name ){
+	        	 this.st_name = st_name;
+	        	 console.log("i am initalized! My name is "+st_name);
+	        },
+	        do : function() {
+	            console.log( this.st_name+" does this");
+	        }
+	    };
+	};
+	//  create static properties
+	Foo.Static = function(jflow) {
+		return{
+			iamStatic: function(){
+				console.log("no instance, just me");
+			}
+		}
+	}
+	
+	jflow.addComponent("Foo", Foo);
+	//  call static method
+	jflow.Foo.iamStatic();
+	
+	
+<h4 >
+Private properties
+</h4>	
+	
+	var Foo = function(jflow) {
+	   //  define private variable
+	   var cantTouchThis = true;
+	   return {
+			
+	        init: function( st_name ){
+	        	 //  do some initialization tasks
+	        	 this.st_name = st_name;
+	        	 console.log("i am initalized! My name is "+st_name);
+	        },
+	        do : function() {
+	            console.log( "cantTouchThis = "+cantTouchThis);
+	        }
+	    };
+	};
+	jflow.addComponent("Foo", Foo);
+	
+	var foo = jflow.Foo();
+	//  writes undefined
+	console.log(foo.cantTouchThis);
+	//  writes "cantTouchThis = true"
+	foo.do();
+
+<h4 >
+Extending Components
+</h4>
+
+	//  component definition
+	var More = function(jflow) {
+
+	    return {
+	
+	        doMore : function() {
+	            console.log("i do more");
+	        }
+	    };
+	};
+	
+	//  Extend Foo Component with More.
+	jflow.addComponent("Foo.More", More);
 	
