@@ -11,7 +11,7 @@ maintainable and reusable code with asynchronous flow control.Some key fetures i
 Documentation
 </h1>
 
-Complete documentation can be found here
+<a href="http://www.infinitycbs.com/jflow/doc" >Complete and comprehisive documentation can be found here</a>
 
 <h1 id="Installation">
 Installation
