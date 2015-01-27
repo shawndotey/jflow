@@ -20,9 +20,8 @@ Installation
 </h1 >
 
 For node.js
-<pre><code>
-npm install jflow-framework
-</code></pre>
+
+	npm install jflow-framework
 
 For Browser, download <a href = "https://github.com/Infinitycbs/jflow/archive/master.zip">here</a> and copy `jflow-framework.js` to 
 your server's desired path
@@ -32,15 +31,13 @@ Usage
 
 
 For node.js
-<pre><code>
-require("jflow-framework");
-</code></pre>
+
+	require("jflow-framework");
+
 
 For the browser, in the HTML header or body footer:
-<pre><code>
-<script src="..pathto/jflow-framework.js"></script>	
-</code></pre>
 
+	<script src="..pathto/jflow-framework.js"></script>
 
 By default, the jFlow instance is global
 
