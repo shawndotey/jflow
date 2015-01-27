@@ -20,9 +20,9 @@ Installation
 </h1 >
 
 For node.js
-
-
-	npm install jflow-framework
+<pre><code>
+npm install jflow-framework;
+</code></pre>	
 
 For Browser, download <a href = "https://github.com/Infinitycbs/jflow/archive/master.zip">here</a> and copy `jflow-framework.js` to 
 your server's desired path
