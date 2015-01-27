@@ -219,85 +219,85 @@ Now lets take the last example and add two more flow-enabled functions, in the f
 the flow object has a proerty of [store] which you may safely use to pass values from one function-segment to the next.
 (i.e `flow.store.someValue = "a string";`)	
 	
-	
-	//  create a flow-enabled function
-	function iCanFlow(){
-		return jflow.pause( this,
-			function( flow ){
-				flow.wait();
-					//  asynchronous call
-				setTimeout(function(){
-					
-					//  continue event
-					flow.continue();
-				}, 200);
-			}, 
-			function( flow ) {
-				return true;
-			}
-		);
-	}
-	//  create a flow-enabled function
-	function iAmData(){
-		return jflow.pause( this,
-			//  function-segment
-			function( flow ){
-				flow.wait();
-				//  asynchronous call
-				setTimeout(function(){
-					
-					//  continue event
-					flow.continue();
-				}, 200);
-			}, 
-			//  function-segment
-			function( flow ) {
-				return [
-					"i","am","a record of an object"
-				];
-			}
-		);
-	}
-	//  create a flow-enabled function
-	function iAmObject(){
-		return jflow.pause( this,
-			function( flow ){
-				flow.wait();
-				//  asynchronous call
-				setTimeout(function(){
-					
-					//  continue event
-					flow.continue();
-				}, 200);
-			}, 
-			function( flow ) {
-				return {
-					i:"am a",
-					normal:"Object"
-				};
-			}
-		);
-	}
-	//  start a pause event
-	var returnValue, returnData, returnObject;
-	jflow.pause( this,
-		//  the first function-segment
+<pre><code>		
+//  create a flow-enabled function
+function iCanFlow(){
+	return jflow.pause( this,
 		function( flow ){
-			
-			returnValue = iCanFlow();
-			returnData = iAmData(); 
-			returnObject = iAmObject();
-		},
-		//  the third function-segment	
+			flow.wait();
+				//  asynchronous call
+			setTimeout(function(){
+				
+				//  continue event
+				flow.continue();
+			}, 200);
+		}, 
 		function( flow ) {
-			console.log("finally, ");  
-			console.log(" returnValue = ", returnValue);
-			console.log(" returnData = ", returnData);
-			console.log(" returnObject = ", returnObject);
-			
+			return true;
 		}
-	);		
-	
+	);
+}
+//  create a flow-enabled function
+function iAmData(){
+	return jflow.pause( this,
+		//  function-segment
+		function( flow ){
+			flow.wait();
+			//  asynchronous call
+			setTimeout(function(){
+				
+				//  continue event
+				flow.continue();
+			}, 200);
+		}, 
+		//  function-segment
+		function( flow ) {
+			return [
+				"i","am","a record of an object"
+			];
+		}
+	);
+}
+//  create a flow-enabled function
+function iAmObject(){
+	return jflow.pause( this,
+		function( flow ){
+			flow.wait();
+			//  asynchronous call
+			setTimeout(function(){
+				
+				//  continue event
+				flow.continue();
+			}, 200);
+		}, 
+		function( flow ) {
+			return {
+				i:"am a",
+				normal:"Object"
+			};
+		}
+	);
+}
+//  start a pause event
+var returnValue, returnData, returnObject;
+jflow.pause( this,
+	//  the first function-segment
+	function( flow ){
+		
+		returnValue = iCanFlow();
+		returnData = iAmData(); 
+		returnObject = iAmObject();
+	},
+	//  the third function-segment	
+	function( flow ) {
+		console.log("finally, ");  
+		console.log(" returnValue = ", returnValue);
+		console.log(" returnData = ", returnData);
+		console.log(" returnObject = ", returnObject);
+		
+	}
+);		
+</code></pre>	
 
 <h3 >
 flow.ignore()
@@ -322,55 +322,55 @@ In the following code note:
 
 * returnValue is an empty Object.
 
-
-	//  create a flow-enabled function
-	function iCanFlow(){
-		return jflow.pause( this,
-			function( flow ){
-				flow.ignore();
-				flow.wait(2);
-				//  asynchronous call
-				setTimeout(function(){
-					console.log("I'm fourth");
-					//  continue event, accounts for one wait event
-					flow.continue();
-				}, 800);
-				//  asynchronous call
-				setTimeout(function(){
-					console.log("I'm third");
-					//  continue event, accounts for one wait event
-					flow.continue();
-				}, 500);
-			},
-			//  prior function-segment 
-			function( flow ) {
-				
-				return true;
-			},
-			//  last function-segment
-			function( flow ) {
-				console.log("I'm last, but you will never see me :(");
-				
-			}
-		);
-	}
-	//  start a pause event
-	var returnValue;
-	jflow.pause( this,
-		
+<pre><code>
+//  create a flow-enabled function
+function iCanFlow(){
+	return jflow.pause( this,
 		function( flow ){
-			
-			console.log("I'm first");		
-			//  call to flow-enabled function
-			returnValue = iCanFlow();
-			
-		}, 
+			flow.ignore();
+			flow.wait(2);
+			//  asynchronous call
+			setTimeout(function(){
+				console.log("I'm fourth");
+				//  continue event, accounts for one wait event
+				flow.continue();
+			}, 800);
+			//  asynchronous call
+			setTimeout(function(){
+				console.log("I'm third");
+				//  continue event, accounts for one wait event
+				flow.continue();
+			}, 500);
+		},
+		//  prior function-segment 
 		function( flow ) {
-			 
-			console.log("I'm second, returnValue = ", returnValue);
+			
+			return true;
+		},
+		//  last function-segment
+		function( flow ) {
+			console.log("I'm last, but you will never see me :(");
+			
 		}
-	);	
-
+	);
+}
+//  start a pause event
+var returnValue;
+jflow.pause( this,
+	
+	function( flow ){
+		
+		console.log("I'm first");		
+		//  call to flow-enabled function
+		returnValue = iCanFlow();
+		
+	}, 
+	function( flow ) {
+		 
+		console.log("I'm second, returnValue = ", returnValue);
+	}
+);	
+</code></pre>
 
 
 <h3 >
@@ -387,30 +387,30 @@ In the following code:
 but a call to `flow.next()`;  making all current wait events accounted for.
 
 
-	
-	//  start a pause event
-	var returnValue;
-	jflow.pause( this,
-		//  the first function-segment
-		function( flow ){
-			flow.wait(7);
-			console.log("I'm first");		
-			
-			//  asynchronous call
-			setTimeout(function(){
-				console.log("I'm second");
-				//  continue event, accounts for one wait event
-				flow.next();
-			}, 100);
-			
-		},
-		//  the second function-segment 
-		function( flow ) {
-			 
-			console.log("I'm third");
-		}
-	);	
-
+<pre><code>	
+//  start a pause event
+var returnValue;
+jflow.pause( this,
+	//  the first function-segment
+	function( flow ){
+		flow.wait(7);
+		console.log("I'm first");		
+		
+		//  asynchronous call
+		setTimeout(function(){
+			console.log("I'm second");
+			//  continue event, accounts for one wait event
+			flow.next();
+		}, 100);
+		
+	},
+	//  the second function-segment 
+	function( flow ) {
+		 
+		console.log("I'm third");
+	}
+);	
+</code></pre>
 
 
 <h3 >
@@ -567,7 +567,7 @@ jFlow components are object instances with a common, extendable and resuable str
 in a traditional Object Oriented Proramming language such as static, public and private members. Each component instance returns 
 a unique object, i.e there is no need to use the "new" keyword.
 
-also, It may be helpful to briefly examine <a href="http://www.infinitycbs.com/jflow/doc/jFlow.html#addComponent">the addComponent definition</a>. 
+Also, It may be helpful to briefly examine the <a href="http://www.infinitycbs.com/jflow/doc/jFlow.html#addComponent">addComponent definition</a>. 
 
 <br />
 
@@ -897,41 +897,41 @@ When this member is present, it is examined before `init`, `initBefore` and `ini
 This method's returning value will become the intialized value if it returns truthy.
 
 <pre><code>
-	//  define Foo component
-	var Foo = function(jflow) {
-	    //  component definition
-	    return {
-			//  This method's returning value will become the intialized value if it returns truthy
-	        subvert: function(){
-	            
-	            //return false;//  <- uncomment this and see what happens
-	            //  returning value will become the intialized value if it returns truthy, and it does
-	            return {
-	                do:function(){
-	                    console.log("i'm subverted! I do this now");
-	                }
-	            }
-	        },
-	        initBefore: function(){
-	            console.log("i ran Foo before init when initalized");
-	        },
-	        init: function(){
-	            console.log("i ran Foo when initalized");
-	        },
-	        //  component method
-	        do : function() {
-	            console.log("i do this");
-	        }
-	    };
-	};
-	
-	jflow.addComponent("Foo", Foo);
-	
-	jflow.ready( function( jflow ){
-		//  create instance
-		var foo = jflow.Foo();    
-		foo.do();
-	});
+//  define Foo component
+var Foo = function(jflow) {
+    //  component definition
+    return {
+		//  This method's returning value will become the intialized value if it returns truthy
+        subvert: function(){
+            
+            //return false;//  <- uncomment this and see what happens
+            //  returning value will become the intialized value if it returns truthy, and it does
+            return {
+                do:function(){
+                    console.log("i'm subverted! I do this now");
+                }
+            }
+        },
+        initBefore: function(){
+            console.log("i ran Foo before init when initalized");
+        },
+        init: function(){
+            console.log("i ran Foo when initalized");
+        },
+        //  component method
+        do : function() {
+            console.log("i do this");
+        }
+    };
+};
+
+jflow.addComponent("Foo", Foo);
+
+jflow.ready( function( jflow ){
+	//  create instance
+	var foo = jflow.Foo();    
+	foo.do();
+});
 
 </code></pre>
 
