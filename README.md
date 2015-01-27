@@ -1,6 +1,6 @@
 
 jFlow Framework, is a model framework for node.js and in the browser. It provides a common component structure for 
-maintainable and reusable code with asynchronous flow control.Some key fetures include:
+maintainable and reusable code with asynchronous flow control.Some key features include:
 
 *	Any number of asynchronous functions can be grouped / organised without the need for callbacks.
 *	Components contain a reusable structure provided in traditional object oriented programming such as static, public and private members.
@@ -20,9 +20,9 @@ Installation
 </h1 >
 
 For node.js
-<pre><code>
-npm install jflow-framework;
-</code></pre>	
+<pre><code>npm install jflow-framework;</code></pre>
+
+	
 
 For Browser, download <a href = "https://github.com/Infinitycbs/jflow/archive/master.zip">here</a> and copy `jflow-framework.js` to 
 your server's desired path
