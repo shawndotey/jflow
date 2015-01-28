@@ -36,14 +36,111 @@ For node.js
 	require("jflow-framework");
 
 
-
-
 For the browser, in the HTML header or body footer:
 
 	<script src="..pathto/jflow-framework.js"></script>
 
 
-
-
 By default, the jFlow instance is global
 
+
+<h2 >
+Basic Asynchronous Example
+</h2>
+
+
+	jflow.pause( this,
+		
+		function( flow ){
+			console.log("I'm first");		
+			//  start a wait event
+			flow.wait();
+			//  asynchronous call
+			setTimeout(function(){
+				console.log("I'm second");
+				//  account for the wait event
+				flow.continue();
+			}, 200);
+		},
+		
+		function( flow ) {
+			console.log("I'm third");
+		}
+	);		
+
+
+The console will write:
+
+`I'm first`
+	
+`I'm second`
+	
+`I'm third`
+
+
+<h2 >
+Component Example
+</h2>
+
+
+	//  define a component
+	var Foo = function(jflow) {
+	   
+	   //  define private variable
+	   var cantTouchThis = true;
+	   
+	    //  component definition
+	    return {
+			// runs when component is initalized
+			init: function( value ){
+	            // assign public property [value] of given instance
+	            this.value = value;
+	
+	            console.log( "i ran when initalized, i was passed a value of ["+value+"]");
+	        },
+			
+			//  component method
+	        do : function() {
+	            console.log("I have a value of ["+this.value+"]");
+	        }
+	    };
+	};
+	
+	//  create static properties
+	// Static definition
+	Foo.Static = function(jflow) {
+		////		object containing the properties you want to assign as static
+		return{
+			//  Static member
+			iamStatic: function(){
+				console.log("no instance, just Static");
+			}
+		};
+	};
+	
+	
+	// add component to the framework
+	jflow.addComponent("Foo", Foo);
+	
+	//  run this when jFlow framework is ready
+	jflow.ready( function( jflow ){
+		
+		//  create instance
+		var foo = jflow.Foo( "bar" );  
+			
+		//  console writes : `i ran when initalized, i was passed a value of [bar]`
+		
+		foo.do();
+		
+		//  console writes : `I have a value of [bar]`
+		
+		// this "Foo" is the installed component, not the instance "foo"
+		jflow.Foo.iamStatic();
+		
+		//  console writes : `no instance, just Static`
+		
+		console.log( foo.cantTouchThis );
+		
+		//  console writes : undefined
+	
+	});
