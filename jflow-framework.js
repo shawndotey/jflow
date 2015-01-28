@@ -1,13 +1,13 @@
 /**
-* About jFlow Framework: http://www.infintycbs.com/jflow
+* About jFlow Framework: http://www.infinitycbs.com/jflow
 * 
 * ====================================================================
 * Licence MIT
 * ====================================================================
 * 
-* @author: Shawn Dotey, mailto: shawn@infintitycbs.com
+* @author: Shawn Dotey, mailto: shawn@infinitycbs.com
 * 
-* Copyright 2014 Shawn Dotey, Infinity CBS
+* Copyright 2014 Shawn Dotey
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
@@ -17,18 +17,33 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 */
 
 
-
-
 "use strict";
 
 
 /** Core framework
+ * <h1 >
+Usage
+</h1>
+
+
+For node.js
+
+	require("jflow-framework");
+
+
+
+
+For the browser, in the HTML header or body footer:
+
+	<script src="..pathto/jflow-framework.js"></script>
+
+
+ * 
+ * 
  * 
  * @class
  * @name jFlow
- *
- * @example
- * 	var jflow = jFlowFramework();
+ * 
  *  */
 var jFlowFramework = function ( ob_option ) {
 	
@@ -92,6 +107,21 @@ jflow.pause( this,
 	var 	ar_onReady 		= 	[];
 	////		////		private functions		////		////
 	var say;
+	var in_ready = 0;
+	var thatJflow;
+	var goReady =  function(){
+		
+		in_ready--;
+		if(in_ready < 1){
+			thatJflow.ready();
+		}
+		
+	};
+	var stopReady = function(){
+		in_ready++;
+	};
+	var st_version = "1.0.10";
+	
 	var checkPause = function( flow ){
 		////		 that.fn_run
 		var  Calling_ob_localScope = flow.Calling_ob_localScope, fn_afterDone = flow.fn_run , ar_paramter = flow._AG;
@@ -187,7 +217,7 @@ jflow.pause( this,
 		is_debug: is_debug,
 		
 		init: function( ob_option ){
-			
+			thatJflow = this;
 			ob_option = ob_option || {};
 			this.ob_option = ob_option;
 			////		increase say scope
@@ -201,7 +231,7 @@ jflow.pause( this,
 			
 			
 			
-			this.stopReady();
+			stopReady();
 			jflow.pause( this,
 				function( flow ){ 
 					
@@ -262,7 +292,7 @@ jflow.pause( this,
 					
 				}, function( flow ) {
 					
-					this.goReady();
+					goReady();
 				
 				}, function( flow ) {
 					var ar_fn_afterReady = jflow.ar_fn_afterReady;
@@ -283,13 +313,75 @@ jflow.pause( this,
 			});
 			return this;
 		},////		init
+		version: function(){
+			return st_version;
+		},
+		/**
+		 Causes any function passed to jflow.ready() to wait until all flow-enabled events are complete
+		*
+		 @see jFlow#ready
+		 @memberOf jFlow#
+		 @return {chainable}
+		 
+		 @param {Function} fn_whenready - executes when jFlow framework is not busy
+		 @param {Array} ar_arguments - list of arguments passed into fn_whenready
+		 @param {Scope} scope - optionally, the scope for fn_whenready
+		
+		 
+		 @example
+	     jflow.notReadyUntil( function( st_toUse ){
+	     	console.log("you said "+st_toUse);
+	     	return jflow.pause( this,
+				function( flow ){ //flow.ignore();
+					//  ... some flow activity
+				
+					
+				}
+			);
+	     	
+	     }["some string"], jflow);
+		*/
+		
+		
+		notReadyUntil: function( fn_notReadyUntil, ar_arguments, scope ){
+			stopReady();
+			scope = scope || {};
+			ar_arguments = ar_arguments || [];
+			return jflow.pause( this,
+				function( flow ){ //flow.ignore();
+					fn_notReadyUntil.apply( scope, ar_arguments );
+				}, function( flow ) {
+					goReady();
+				}
+			);
+		
+			return this;
+		},////		notReadyUntil
+		/**
+		 Function to execute when the framework is ready.  This works in conjunction with jflow.notReadyUntil() 
+		*
+		 @see jFlow#notReadyUntil
+		 @memberOf jFlow#
+		
+		 @param {Function} fn_whenready - executes when the jFlow framework is not busy.
+		 When executed, the current jFlow instance is passed into the first argument.
+		
+		 @return {chainable}
+		
+		 
+		 @example
+		     jflow.ready(function( jflow ){
+		     	
+		     	//do stuff now that jflow is ready
+		     });
+		*/
 		ready: function( fn_whenready ){
 			
 			if( typeof fn_whenready === "function"){
 				ar_onReady.push(fn_whenready);
 			}
 			
-			if( !this.is_ready){
+			if( in_ready > 0 ){
 				
 				return this;
 				
@@ -297,18 +389,13 @@ jflow.pause( this,
 			
 			for(var i=0,j=ar_onReady.length; i<j; i++){
 				var fn_ready = ar_onReady[i];
+				delete ar_onReady[i];
 				fn_ready( jflow );
 			};
 				
 			return this;
 		},
-		goReady: function(){
-			this.is_ready = true;
-			this.ready();
-		},
-		stopReady: function(){
-			this.is_ready = false;
-		},
+		
 		/**
 		 Test if this script is ran on node.js
 		*
@@ -534,15 +621,14 @@ jflow.pause( this,
 					jflow.pause( this,
 					function( flow ){
 						if( jflow.is_debug ) say("installComponent: onInstall "+st_componentName+"");						
-						flow.ob_store.is_ready = jflow.is_ready;
-						jflow.is_ready = false;
-						currentComponentValue( jflow );
+//flow.ob_store.is_ready = jflow.is_ready;
+						jflow.notReadyUntil( currentComponentValue, [this] );
 						if( jflow.is_debug ) say(false, "installComponent: onInstall ran "+st_componentName+"  ");									
 					}, function( flow ) {
 						
-						jflow.is_ready = flow.ob_store.is_ready;
+//jflow.is_ready = flow.ob_store.is_ready;
 
-						if(jflow.is_ready) jflow.ready();
+//if(jflow.is_ready) jflow.ready();
 
 					});
 				}
@@ -565,7 +651,7 @@ jflow.pause( this,
 		/**
 		Used to organize the order of asynchronous activity. 
 		
-See {@tutorial pause} for more details and in depth examples.
+See <a href="http://www.infinitycbs.com:5858/jflow/doc/#toc3" target="_blank" >Asynchronous Flow Control</a>  for more details and in depth examples.
 		
 		@param {Object} scope What the function-segments are applied to when called
 		@param {...Function} function-segment Function to be called in order. separated by pause-enabled controls (flow)
@@ -791,9 +877,9 @@ jflow.is_sayReadoutOff = true;
 </code></pre>
 
 		
-		@return chainable
+		@return {chainable}
 		@memberOf jFlow#
-		@chainable
+		{chainable}
 		
 		*/	
 		////		used for debugging, prints in console
@@ -803,15 +889,16 @@ jflow.is_sayReadoutOff = true;
 			if( jflow.is_sayOff ){
 				return;
 			}
+			//  is this grouped
 			var is_skim = arguments[0] === false ? true:false;
 			var ob_skip = {};
-			
+			//  not grouped
 			if (!is_skim) { console.log(""); }
-		
+			//  traverse arguments
 			for ( var index in arguments )  {
 				
 				var sayVal = arguments[ index ];
-				
+				//  skip first arguement if false and there are other arguments
 				if(sayVal === false && index == 0 ){ 
 					ob_skip[ index ] = true;
 					continue; 
@@ -820,40 +907,95 @@ jflow.is_sayReadoutOff = true;
 				
 				if( (typeof sayVal) == "object" || typeof sayVal === 'array'){ 
 						
-					////		print out
+					//  write out object if allowed
 					if( !jflow.is_sayReadoutOff ){ console.dir(sayVal); }
 
 				}	
 				else {
-					
+					//  write out noon object if allowed
 					if( !jflow.is_sayReadoutOff ){ console.log(""+">"+sayVal+"<"); }
 
 				}
 			}
+			//  are we creating a log?
 			if( jflow.is_sendLog ){
 				for(var i=0,j=arguments.length; i<j; i++){
 				  if(!arguments[i]) continue;
 				  jflow.ar_log.push(arguments[i]);
 				};
 			}	
+			//  do we show a stack trace?
 			if( jflow.is_debugStacktrace ){
 				if( !jflow.is_sayReadoutOff ){ console.trace(); }
 			}	
 				
 			return this;
-		},//end say
+		},// say
 		/**
 			Same as {@link jFlow#installComponent installComponent}  except jFlow.addComponent can be called before the framework is initalized
+			
+			
+		 @chainable
+		
+		 @param {String} st_componentName Name of component.  You can extend a pre-existing component by simply referring to the component 
+		 in the string separated by a "."
+		 @param {Function} fn_component a function returning an object.
+		 Recursively, will search [fn_component] for attached extentions
 
-See {@tutorial useComponent} for more details and in depth examples.			
+See <a href="http://www.infinitycbs.com:5858/jflow/doc/#toc10" target="_blank" >Components</a> for more details and in depth examples.			
+		
+			
+			@example
+			
+		
+			////		define a component
+			var Something = function(jflow) {
+				return {
+			
+					do : function() {
+						alert("i do this")
+					}
+				};
+			}
+			////		define a extention for "Something"
+			var More = function(jflow) {
+			
+				return {
+			
+					doMore : function() {
+						alert("i do more")
+					}
+				};
+			}
+			////		define a extention that will recursively, search [fn_component] for extentions
+			More.TooMuch = function(jflow) {
+			
+				return {
+			
+					doOverload : function() {
+						alert("i do tooMuch")
+					}
+				};
+			}
+			jflow.addComponent("Something", Something);
+			////		You can extend a pre-existing component by 
+			////		simply referring to the component in the string, separated by a "."
+			jflow.addComponent("Something.More", More);
+			var foo = jflow.Something.More.TooMuch();
+			foo.do();
+			foo.doMore();
+			foo.doOverload();
+		
+		
 			@see jFlow#installComponent
 			@memberOf jFlow#
 			
 		*/
 		addComponent: function( st_componentName, fn_component ){
 			jFlowFramework.addComponent.apply( this, arguments);
-		}
-
+		},
+		is_jflow:"iamjflow"
+		
 			
 			
 	};////		_construct jFlowFramework
@@ -864,11 +1006,10 @@ See {@tutorial useComponent} for more details and in depth examples.
 	
 };////		end framework jFlowFramework
 
-////		WARNING: jFlowFramework is dependent on jFlowFramework.addComponent
 /**
 			Same as {@jFlow#installComponent}  except jFlow.addComponent can be called before the framework is initalized
 
-See {@tutorial useComponent} for more details and in depth examples.			
+			See <a href="http://www.infinitycbs.com:5858/jflow/doc/#toc11" target="_blank" >Components<a/>  for more details and in depth examples.			
 			@see jFlow#installComponent
 			@memberOf jFlow#
 			
@@ -900,19 +1041,130 @@ jFlowFramework.addComponent = function(st_componentName, fn_component) {
 };
 
 
+/**
+Compare what version is newer between two strings
+		
+	
+	@memberOf jFlow#
+	@Returns {Number} 1 if a > b 
+	@Returns {Number} -1 if a < b
+	@Returns {Number} 0 if a == b
+*/
+jFlowFramework.versionCompare = function( a, b ){
+	
+	if (a === b) {
+       return 0;
+    }
+
+    var a_components = a.split(".");
+    var b_components = b.split(".");
+
+    var len = Math.min(a_components.length, b_components.length);
+
+    // loop while the components are equal
+    for (var i = 0; i < len; i++) {
+        // A bigger than B
+        if (parseInt(a_components[i]) > parseInt(b_components[i])) {
+            return 1;
+        }
+
+        // B bigger than A
+        if (parseInt(a_components[i]) < parseInt(b_components[i])) {
+            return -1;
+        }
+    }
+
+    // If one's a prefix of the other, the longer one is greater.
+    if (a_components.length > b_components.length) {
+        return 1;
+    }
+
+    if (a_components.length < b_components.length) {
+        return -1;
+    }
+
+    // Otherwise they are the same.
+    return 0;
+
+	
+};
+jFlowFramework.checkIntegrity = function( currentJflow, otherJflow ){
+	
+	if( typeof currentJflow !== "object" ){
+		return{
+			result: false,
+			code:"notreal",
+			reason: "Current global Jflow property is not an Object"
+		};
+	};
+	if ( currentJflow.is_jflow !== "iamjflow" ){
+		return{
+			result: false,
+			code:"notreal",
+			reason: "Current global Jflow property is not an authentic jFlow Framework"
+		};
+	};
+	//  are we compareing to another version?
+	if ( jFlowFramework.checkIntegrity( otherJflow ).result ){
+		var in_new = currentJflow.version( currentJflow, otherJflow );
+		if (in_new === 1){
+			
+			return{
+				result: false,
+				code:"old",
+				reason: "Current framework is an older version"
+			};
+		}
+		
+	};
+	return{
+		
+		result: true,
+		
+	};
+};
 
 
-
-
-
+//  initalize framework
+var newjFlow = jFlowFramework();
 if (typeof exports === 'object' ){
 	
 	
 	console.log("\n\n");	
-	console.log("jflow Framework, infinitycbs.com/jflow");	
-	console.log("\n\n");
+	console.log("jFlow Framework, version "+newjFlow.version()+"");	
+	console.log(" infinitycbs.com/jflow\n\n");
 	
-	
-	module.exports = jFlowFramework();
+	if(GLOBAL.jflow){
+		var result = jFlowFramework.checkIntegrity( GLOBAL.jflow, newjFlow );
+		
+		if( !result.result ){
+			console.log("jFlow WARNING: "+result.reason);
+		}
+		throw new Error("jFlow WARNING: jFlow Framework was attampting to initalize while a current version of jflow already exists");
+		
+	}
+	else{
+		GLOBAL.jflow = newjFlow;
+		
+	} 
+	module.exports = newjFlow;
 }
+else{
+	
+	if(window.jflow){
+
+		var result = jFlowFramework.checkIntegrity( window.jflow, newjFlow );
+		
+		if( !result.result ){
+			console.log("jFlow WARNING: "+result.reason);
+		}
+		throw new Error("jFlow WARNING: jFlow Framework was attampting to initalize while a current version of jflow already exists");
+		
+	}
+	else{
+		window.jflow = newjFlow;
+	}
+	
+}
+
 
