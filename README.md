@@ -12,7 +12,7 @@ Documentation
 </h1>
 
 <h3>
-<a href="http://www.infinitycbs.com/jflow/doc" target="_blank" >Complete and comprehensive documentation can be found here</a>
+<a href="http://www.infinitycbs.com/jflow/" target="_blank" >Complete documentation can be found here</a>
 </h3>
 
 <h1 id="Installation">
