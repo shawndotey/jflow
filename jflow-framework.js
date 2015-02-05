@@ -1,19 +1,20 @@
 /**
-* About jFlow Framework: http://www.infinitycbs.com/jflow
-* 
-* ====================================================================
-* Licence MIT
-* ====================================================================
-* 
-* @author: Shawn Dotey, mailto: shawn@infinitycbs.com
-* 
-* Copyright 2014 Shawn Dotey
+ About jFlow Framework: http://www.infinitycbs.com/jflow
+ 
+ ====================================================================
+ Licence MIT
+ ====================================================================
+ 
+ @author: Shawn Dotey, mailto: shawn@infinitycbs.com
+
+ Copyright 2014 Shawn Dotey
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 */
 
 
@@ -37,10 +38,6 @@ For the browser, in the HTML header or body footer:
 
 	<script src="..pathto/jflow-framework.js"></script>
 
-
- * 
- * 
- * 
  * @class
  * @name jFlow
  * 
@@ -120,7 +117,7 @@ jflow.pause( this,
 	var stopReady = function(){
 		in_ready++;
 	};
-	var st_version = "1.0.10";
+	var st_version = "1.0";
 	
 	var checkPause = function( flow ){
 		////		 that.fn_run
@@ -375,6 +372,27 @@ jflow.pause( this,
 		     	//do stuff now that jflow is ready
 		     });
 		*/
+		readyFirst: function( fn_whenready ){
+			
+			if( typeof fn_whenready === "function"){
+				ar_onReady.unshift(fn_whenready);
+			}
+			
+			if( in_ready > 0 ){
+				
+				return this;
+				
+			}
+			
+			while(ar_onReady.length>0){
+				var fn_ready = ar_onReady.shift();
+				if(fn_ready){
+					fn_ready( jflow );
+				}
+			};
+			
+			return this;
+		},
 		ready: function( fn_whenready ){
 			
 			if( typeof fn_whenready === "function"){
@@ -387,12 +405,13 @@ jflow.pause( this,
 				
 			}
 			
-			for(var i=0,j=ar_onReady.length; i<j; i++){
-				var fn_ready = ar_onReady[i];
-				delete ar_onReady[i];
-				fn_ready( jflow );
+			while(ar_onReady.length>0){
+				var fn_ready = ar_onReady.shift();
+				if(fn_ready){
+					fn_ready( jflow );
+				}
 			};
-				
+			
 			return this;
 		},
 		
@@ -487,11 +506,11 @@ jflow.pause( this,
 		installComponent : function( st_componentName, fn_component ) {		
 			
 			////		private argument used recursively
-			var ob_atComponent = arguments[2];
-			if (!ob_atComponent) {
+			var fn_atComponent = arguments[2];
+			if (!fn_atComponent) {
 				var ob_place = this;
 			} else {
-				var ob_place = ob_atComponent;
+				var ob_place = fn_atComponent;
 			}
 			////		these properties are reserved
 			var ob_reservedNames = {
@@ -513,7 +532,7 @@ jflow.pause( this,
 						throw new Error("addComponent: ["+st_currentComponent+"] doesn't exist yet, add component ["+st_currentComponent+"] before adding ["+st_componentName+"]");
 					}
 					////		
-					ob_atComponent = ob_place;
+					fn_atComponent = ob_place;
 				
 				  
 				};
@@ -532,15 +551,15 @@ jflow.pause( this,
 					throw new Error(" component ["+st_componentName+"] must return an object of values");
 				}
 				////		is this an extention of another component?
-				if ( ob_atComponent ) {
+				if ( fn_atComponent ) {
 					////		is this an extention of another component? = yes
 					////		get constructed parent component, do not run init procedure
 					////		this creates a recursive cycle until jflow root component is found 
-					var ob_atComponentConstructed = ob_atComponent( "~-is_skipInit" );
+					var fn_atComponentConstructed = fn_atComponent( "~-is_skipInit" );
 					////		each extended component needs to use its own init property
-					delete ob_atComponentConstructed.init;
+					delete fn_atComponentConstructed.init;
 					////		merge parent component with new component
-					ob_constructed = merge( ob_atComponentConstructed, clone( ob_constructed ) );
+					ob_constructed = merge( fn_atComponentConstructed, clone( ob_constructed ) );
 					
 				}
 				
